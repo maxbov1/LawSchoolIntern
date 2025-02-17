@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CSV Upload to Law School Database</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <script>
+        function toggleUpload() {
+            const selectedCategory = document.querySelector('input[name="category"]:checked');
+            const uploadSection = document.getElementById('upload-section');
+            if (selectedCategory) {
+                uploadSection.style.display = 'block';
+            }
+        }
+
+        function showSpinner() {
+            const spinner = document.getElementById('spinner');
+            spinner.style.display = 'block';
+        }
+    </script>
+</head>
+<body>
+    <header class="header">
+        <div class="header-content">
+            <h1>University of Arizona</h1>
+            <h2>Law School Database CSV Uploader</h2>
+        </div>
+    </header>
+
+    <main class="main-content">
+        <div class="form-container">
+            <h3>Select a Category and Upload Your File</h3>
+            <form action="/upload" method="post" enctype="multipart/form-data" onsubmit="showSpinner()">
+                <div class="radio-group">
+                    <label>
+                        <input type="radio" name="category" value="additional" onclick="toggleUpload()"> Additional
+                    </label>
+                    <label>
+                        <input type="radio" name="category" value="registrar" onclick="toggleUpload()"> Registrar
+                    </label>
+                    <label>
+                        <input type="radio" name="category" value="admissions" onclick="toggleUpload()"> Admissions
+                    </label>
+                </div>
+
+                <div id="upload-section" style="display: none; margin-top: 20px;">
+                    <input type="file" name="file" accept=".csv" required>
+                    <button type="submit">Upload</button>
+                </div>
+            </form>
+
+            <div id="spinner" class="spinner" style="display: none;">
+                <div class="lds-ring"><div></div><div></div><div></div><div></div></div>
+                <p>Processing your file, please wait...</p>
+            </div>
+
+            {% if message %}
+            <div class="message">
+                {{ message }}
+            </div>
+            {% endif %}
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <p>&copy; 2025 University of Arizona Law School | All Rights Reserved</p>
+    </footer>
+</body>
+</html>
+
