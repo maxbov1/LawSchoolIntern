@@ -1,0 +1,35 @@
+# Database Schema for Law School Student Records
+
+
+# --------------------------
+# Table: identity
+# --------------------------
+# Stores personal details of students.
+# Columns:
+# - SID (Primary Key): Unique identifier for each student.
+# - lastname: Student's last name.
+# - firstname: Student's first name.
+# - NetID: Unique network ID for authentication.
+# - ua_email: University email address.
+
+# --------------------------
+# Table: academics
+# --------------------------
+# Stores academic performance details.
+# Columns:
+# - SID (Primary Key, Foreign Key): Links to identity(SID).
+# - undergrad_gpa: Student’s undergraduate GPA.
+# - lsat: LSAT score.
+# - law_gpa: Law school GPA.( incoming from registrar) 
+
+# --------------------------
+# Table: additional
+# --------------------------
+# Stores additional information such as bar review participation.
+# Columns:
+# - SID (Primary Key, Foreign Key): Links to identity(SID).
+# - review_completion: % of the commercial bar review course completed 1 week prior to due date .  
+# -  bar_review : the name of the institution of the commercial bar course the student took. 
+
+
+
