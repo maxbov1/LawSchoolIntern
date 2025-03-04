@@ -1,0 +1,48 @@
+# Ignore Python bytecode and cache
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+*.swp  # Vim swap files
+
+# Ignore virtual environments
+venv/
+env/
+*.egg-info/
+
+# Ignore unnecessary Docker files
+.dockerignore
+Dockerfile~
+docker-compose.override.yml
+
+# Ignore logs and temp files
+logs/
+*.log
+nohup.out
+debug.log
+
+# Ignore system files (macOS, Linux, Windows)
+.DS_Store
+Thumbs.db
+
+# Ignore IDE/editor config files
+.vscode/
+.idea/
+*.iml
+
+# Ignore compiled Cython files (if any)
+*.so
+*.c
+*.o
+
+# Ignore local database and secrets
+*.db
+*.sqlite
+.env
+secrets.json
+
+# Ignore any backups
+*.bak
+*.swp
+*.swo
+
