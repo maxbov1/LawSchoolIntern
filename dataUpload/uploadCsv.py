@@ -23,25 +23,27 @@ def process_csv(filepath, category):
     """
     # Read the CSV file
     df = pd.read_csv(filepath, encoding='latin-1')
-
+    logging.debug(f"Category received: {category}")
     # Process based on category
     if category == 'additional':
         clean = extract(cols=["","",""],category='additional',data=df) 
         inserted = insert_data(clean,category='additional')    
+
     elif category == 'registrar':
         clean = extract(category='registrar',data=df)
-        inserted = insert_data(clean,category='registrar')
-
-    elif category == 'admissions':
-        clean = extract(category='admissions',data=df)
-        missing_values = clean[clean['firstname'].isna() | clean['lastname'].isna()]
-        if not missing_values.empty:
-            logging.info(f"Rows with NaN in 'First' or 'Last':\n{missing_values}")
-
         genkey = os.getenv("genkey")
         encrypted = encrypt_dataframe(clean,genkey)
         logging.info(f'encrypted_df : encrypted')
-        inserted = insert_data(encrypted,category='admissions')
+        inserted = insert_data(encrypted,category='registrar')
+    elif category == 'bar':
+        logging.debug(f"bar category selected")
+        clean = extract(category='bar',data=df)
+        logging.debug(f"bar data cleaned : {clean}")
+        inserted = insert_data(clean, category='bar')
+
+    elif category == 'admissions':
+        clean = extract(category='admissions',data=df)
+        inserted = insert_data(clean,category='admissions')
     else:
         raise ValueError("Invalid category provided")
     

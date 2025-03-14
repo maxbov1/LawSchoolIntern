@@ -1,5 +1,6 @@
 from cryptography.fernet import Fernet
 import pandas as pd
+import logging
 
 def encrypt_value(value, cipher):
     if pd.isna(value):  
@@ -16,7 +17,7 @@ def encrypt_dataframe(df, gk):
     this function accepts the admissions dataframe, and a generated key. The function returns the df with fields "firstname" and "lastname" encrypted.
 
     '''
-    cipher = Fernet(gk)  
+    cipher = Fernet(gk) 
     df['firstname'] = df['firstname'].apply(lambda x: encrypt_value(x, cipher))
     df['lastname'] = df['lastname'].apply(lambda x: encrypt_value(x, cipher))
     return df
