@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+
+{% block title %}Data Management System{% endblock %}
+
+{% block content %}
+<div class="form-container">
+    <h3>Welcome to the Data Management App</h3>
+    <p>Upload CSV files and explore insights in Tableau.</p>
+
+    <button onclick="window.location.href='{{ url_for('upload_file') }}'">Upload Data</button>
+    <button onclick="window.location.href='{{ url_for('dashboard') }}'">View Dashboard</button>
+</div>
+{% endblock %}
+

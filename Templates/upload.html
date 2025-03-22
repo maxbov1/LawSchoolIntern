@@ -3,19 +3,22 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CSV Upload to Law School Database</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='/style.css') }}">
+
+    <title>CSV Uploader</title>
     <script>
         function toggleUpload() {
-            const selectedCategory = document.querySelector('input[name="category"]:checked');
-            const uploadSection = document.getElementById('upload-section');
+            var uploadSection = document.getElementById('upload-section');
+            var selectedCategory = document.querySelector('input[name="category"]:checked');
             if (selectedCategory) {
                 uploadSection.style.display = 'block';
+            } else {
+                uploadSection.style.display = 'none';
             }
         }
 
         function showSpinner() {
-            const spinner = document.getElementById('spinner');
+            var spinner = document.getElementById('spinner');
             spinner.style.display = 'block';
         }
     </script>
@@ -31,19 +34,14 @@
     <main class="main-content">
         <div class="form-container">
             <h3>Select a Category and Upload Your File</h3>
-            <form action="/upload" method="post" enctype="multipart/form-data" onsubmit="showSpinner()">
+            <form action="{{ url_for('upload_file') }}" method="POST" enctype="multipart/form-data" onsubmit="showSpinner()">
                 <div class="radio-group">
-                    <label>
-                        <input type="radio" name="category" value="additional" onclick="toggleUpload()"> Additional
-                    </label>
-                    <label>
-                        <input type="radio" name="category" value="registrar" onclick="toggleUpload()"> Registrar
-                    </label>
-                    <label>
-                        <input type="radio" name="category" value="admissions" onclick="toggleUpload()"> Admissions
-                    </label>
-                    <label>
-                        <input type="radio" name="category" value="bar" onclick="toggleUpload()"> Bar                </label>
+                    {% for category in categories %}
+                        <label>
+                            <input type="radio" name="category" value="{{ category }}" onclick="toggleUpload()">
+                            {{ category | capitalize }}
+                        </label>
+                    {% endfor %}
                 </div>
 
                 <div id="upload-section" style="display: none; margin-top: 20px;">
@@ -62,6 +60,7 @@
                 {{ message }}
             </div>
             {% endif %}
+            <button onclick="window.location.href='{{ url_for('home') }}'" class="back-button">⬅ Back to Home</button>
         </div>
     </main>
 
