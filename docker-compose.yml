@@ -1,13 +1,13 @@
-version: "3.8"
 
 services:
   flask_app:
     build: .
     ports:
-      - "5000:5000"
+      - "5050:5050"
     env_file:
       - .env
     volumes:
       - .:/app
+      - /home/ec2-user/BarSuccess/LawIntern/config:/app/app/config
     restart: always
 

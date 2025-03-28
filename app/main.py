@@ -1,11 +1,11 @@
-from flask import Flask, request, render_template, session, redirect, url_for 
+from flask import Flask, request, render_template, session, redirect, url_for, jsonify 
 import logging
 import os
 from datetime import datetime
 import secrets
 import json
 import subprocess
-
+from utils.config_loader import load_config
 # Importing from app subdirectories
 from dataUpload.uploadCsv import allowed_file, process_csv
 from dataBase.dbBuilder import build_db
@@ -66,13 +66,10 @@ def upload_file():
     if not session.get("logged_in"):
         return redirect(url_for("login"))
 
-    # Handle GET request
     if request.method == 'GET':
         try:
-            config_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), '../config/data_source_config.json')
-            with open(config_path) as f:
-                config = json.load(f)
-            categories = list(config['data_sources'].keys())
+            config = load_config()
+            categories = list(config.data_sources.keys())
         except Exception as e:
             logging.error(f"Failed to load categories: {e}")
             categories = []
@@ -93,18 +90,18 @@ def upload_file():
         os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
         file.save(filepath)
 
+        
         try:
-            timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
             result_message = process_csv(filepath, category)
-            success_message = f"{file.filename} processed and saved successfully at {timestamp}."
-            logging.info(f"✅ File uploaded: {file.filename}, Category: {category}, Status: Success")
-            return render_template('upload.html', message=success_message)
+            if 'Error' in result_message:
+                return render_template('upload.html', message=result_message)
+            else:
+                return render_template('upload.html', message=result_message)  # Use the result_message here
         except Exception as e:
             logging.error(f"❌ Error processing file: {e}")
             return render_template('upload.html', message=f"Error processing file: {e}")
 
     return render_template('upload.html', message="Invalid file type.")
-
 
 # Dashboard Route
 @app.route("/dashboard")
@@ -117,42 +114,75 @@ def dashboard():
 def config_form():
     return render_template("config.html")
 
-
-# Save Configuration Route
 @app.route('/save_config', methods=['POST'])
 def save_config():
     try:
         data = request.form.to_dict()
         data_sources = {}
+        sensitive_columns = []  # List to store sensitive columns
+        identifier = None  # To store UID (identifier)
+        target_variable = None
+
+        target_variable = data.get('target_variable')
+        logging.debug(f"Received target variable: {target_variable}")
+
+        # Ensure the target variable is present
+        if not target_variable:
+            logging.error("Target variable is missing!")
+            return "Error: Target variable is missing.", 400
+
+        # Loop over the form data to process each source
         for key, value in data.items():
             if key.startswith("source_name_"):
                 source_id = key.split("_")[2]
                 source_name = value
                 feature_count = int(data.get(f"feature_count_{source_id}", 0))
-                features = []
+                features = {}
 
                 for feature_id in range(1, feature_count + 1):
                     feature_name = data.get(f"feature_name_{source_id}_{feature_id}")
                     feature_type = data.get(f"feature_type_{source_id}_{feature_id}")
+                    is_sensitive = data.get(f"sensitive_{source_id}_{feature_id}") == 'on'
+                    is_identifier = data.get(f"identifier_{source_id}_{feature_id}") == 'on'
+
                     if feature_name and feature_type:
-                        features.append({"name": feature_name, "type": feature_type})
+                        features[feature_name] = feature_type
 
-                data_sources[source_name] = {
-                    "features": features
-                }
+                        # Add sensitive columns
+                        if is_sensitive:
+                            sensitive_columns.append(feature_name)
 
-        config = {"data_sources": data_sources}
+                        # Set UID (identifier) field
+                        if is_identifier:
+                            identifier = feature_name
+
+                data_sources[source_name] = features
+
+        # Log the final config structure before saving
+        config = {
+            "target_variable": target_variable,
+            "identifier": identifier,
+            "sensitive_columns": sensitive_columns,
+            "data_sources": data_sources
+        }
+
+        logging.debug(f"Final configuration to be saved: {json.dumps(config, indent=4)}")
+
+        # Save the configuration to a JSON file
         os.makedirs("config", exist_ok=True)
         config_path = os.path.join("config", "data_source_config.json")
         with open(config_path, "w") as file:
             json.dump(config, file, indent=4)
-
+        try:
+            build_db()
+            return logging.info(f"Database created successfully!")
+        except Exception as e:
+            logging.error(f"❌ Error building database: {e}")
         logging.info(f"✅ Configuration saved successfully: {config_path}")
-        return "Configuration saved successfully!"
+        return jsonify({"message": "Configuration saved successfully!"})
     except Exception as e:
         logging.error(f"❌ Error saving configuration: {e}")
-        return f"Error saving configuration: {str(e)}", 500
-
+        return jsonify({"error": f"Error saving configuration: {str(e)}"}), 500
 
 # Build Database Route
 @app.route('/build_db', methods=['GET'])

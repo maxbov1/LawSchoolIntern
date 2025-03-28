@@ -12,14 +12,21 @@ def decrypt_value(value, cipher):
         return value
     return cipher.decrypt(value.encode()).decode()
 
-def encrypt_dataframe(df, gk):
+def encrypt_dataframe(df, sensitive_columns, gk):
     '''
-    this function accepts the admissions dataframe, and a generated key. The function returns the df with fields "firstname" and "lastname" encrypted.
-
+    This function accepts a dataframe, a list of sensitive columns, and a generated key.
+    It returns the dataframe with sensitive fields encrypted.
     '''
     cipher = Fernet(gk) 
-    df['firstname'] = df['firstname'].apply(lambda x: encrypt_value(x, cipher))
-    df['lastname'] = df['lastname'].apply(lambda x: encrypt_value(x, cipher))
+
+    # Iterate over all sensitive columns in the list and encrypt each
+    for col in sensitive_columns:
+        if col in df.columns:
+            df[col] = df[col].apply(lambda x: encrypt_value(x, cipher))
+            logging.info(f"Encrypted column '{col}'")
+        else:
+            logging.warning(f"Sensitive column '{col}' not found in dataframe, skipping encryption.")
+
     return df
 
 def decrypt_dataframe(df, gk):

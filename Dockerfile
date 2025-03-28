@@ -8,12 +8,15 @@ WORKDIR /app
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
+# Ensure config directory exists at runtime
+RUN mkdir -p /app/config
+
 # Copy the rest of the app
 COPY . .
 
 # Expose Flask port
-EXPOSE 5000
+EXPOSE 5050
 
 # Run Flask
-CMD ["python", "app.py"]
+CMD ["python", "app/main.py"]
 

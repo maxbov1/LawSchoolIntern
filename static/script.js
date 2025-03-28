@@ -2,11 +2,25 @@
 let globalUID = null;
 let globalTarget = null;
 
-// Form Submission
 function submitForm(event) {
     event.preventDefault();
     const form = event.target;
     const formData = new FormData(form);
+
+    // Log current values before submission
+    console.log("Before submitting, current Global Target:", globalTarget);
+    console.log("Before submitting, current Global UID:", globalUID);
+
+    // Remove any existing target_variable to avoid duplicates
+    formData.delete("target_variable");
+
+    // Append the global target to the form data
+    formData.append("target_variable", globalTarget); // Only append globalTarget once
+    formData.append("identifier", globalUID);
+
+    // Log the form data before submitting
+    console.log("Form data being submitted:", formData);
+
     fetch(form.action, {
         method: "POST",
         body: formData
@@ -18,39 +32,6 @@ function submitForm(event) {
     .catch(error => console.error("Error saving configuration:", error));
 }
 
-// Feature Handling
-function toggleSensitive(element) {
-    const featureInput = element.parentElement.previousElementSibling;
-    if (element.checked) {
-        featureInput.classList.add("sensitive-overlay");
-    } else {
-        featureInput.classList.remove("sensitive-overlay");
-    }
-    updateVisualization();
-}
-function toggleTarget(element) {
-    const allTargetRadios = document.querySelectorAll("input[type='radio'][name='target']");
-    const featureName = element.closest('.feature-item').querySelector('input[type="text"]').value;
-
-    console.log("Toggle Target called:");
-    console.log("Feature Name:", featureName);
-    console.log("Current Global Target:", globalTarget);
-
-    // Uncheck any other selected targets
-    allTargetRadios.forEach((radio) => {
-        if (radio !== element && radio.checked) {
-            radio.checked = false;
-            console.log("Unchecking previous target:", radio);
-        }
-    });
-
-    // Set the global target to the new feature name
-    globalTarget = featureName;
-    console.log("Setting Global Target to:", globalTarget);
-
-    updateVisualization();
-}
-
 function addFeature(sourceId) {
     const featureContainer = document.getElementById(`features_${sourceId}`);
     const featureCount = featureContainer.children.length + 1;
@@ -59,6 +40,12 @@ function addFeature(sourceId) {
     featureDiv.className = 'feature-item';
     featureDiv.innerHTML = `
         <input type="text" name="feature_name_${sourceId}_${featureCount}" placeholder="Enter feature name" required>
+        <select name="feature_type_${sourceId}_${featureCount}">
+            <option value="string">String</option>
+            <option value="float">Float</option>
+            <option value="int">Integer</option>
+            <option value="bool">Boolean</option>
+        </select>
         <label class="sensitive-label">
             <input type="checkbox" name="sensitive_${sourceId}_${featureCount}" onclick="toggleSensitive(this)">
             <i class="fa-solid fa-lock" style="color: red;"></i> Sensitive
@@ -168,6 +155,34 @@ function toggleIdentifier(element) {
 
     updateVisualization();
     updateTargetAndIdentifierOptions();
+}
+function toggleTarget(element) {
+    const allTargetRadios = document.querySelectorAll("input[type='radio'][name='target']");
+    const featureName = element.closest('.feature-item').querySelector('input[type="text"]').value;
+
+    console.log("Toggle Target called:");
+    console.log("Feature Name:", featureName);
+    console.log("Current Global Target:", globalTarget);
+
+    // Check if the target variable is already set to the current feature
+    if (globalTarget === featureName) {
+        console.log("Target variable is already set to:", globalTarget);
+        return; // If the same target is clicked again, exit the function
+    }
+
+    // Uncheck any other selected targets
+    allTargetRadios.forEach((radio) => {
+        if (radio !== element && radio.checked) {
+            radio.checked = false;
+            console.log("Unchecking previous target:", radio);
+        }
+    });
+
+    // Set the global target to the new feature name
+    globalTarget = featureName;
+    console.log("Setting Global Target to:", globalTarget);
+
+    updateVisualization();
 }
 
 // Visualization Update
