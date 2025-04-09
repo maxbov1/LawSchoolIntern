@@ -1,13 +1,12 @@
-
 services:
   flask_app:
     build: .
     ports:
       - "5050:5050"
-    env_file:
-      - .env
     volumes:
-      - .:/app
-      - /home/ec2-user/BarSuccess/LawIntern/config:/app/app/config
+      - /home/ec2-user/BarSuccess/LawSchoolIntern:/app
+      - /home/ec2-user/BarSuccess/LawSchoolIntern/config/model_configs:/app/config/model_configs
+      - /home/ec2-user/BarSuccess/LawSchoolIntern/config:/app/config
+      - /home/ec2-user/BarSuccess/LawSchoolIntern/models:/app/models
     restart: always
 

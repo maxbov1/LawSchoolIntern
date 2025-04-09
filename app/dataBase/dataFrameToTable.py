@@ -5,8 +5,6 @@ import os
 import numpy as np
 from utils.config_loader import load_config
 
-# Configure logging
-logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 
 def db_connect():
     """ Establishes a connection to the MySQL database. """

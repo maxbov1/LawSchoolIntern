@@ -1,0 +1,9 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="form-container">
+    <h2>Prediction Results</h2>
+    {{ table|safe }}
+    <br><br>
+    <a href="{{ url_for('home') }}"><button class="btn-secondary">Return to Home</button></a>
+{% endblock %}
+
