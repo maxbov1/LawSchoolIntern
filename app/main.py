@@ -269,7 +269,12 @@ def predictions():
             )
 
         # Save model config
-        model_config = {'features': selected, 'target': target}
+        model_config = {
+        'model_name': model_name,
+        'features': selected,
+        'target': target
+        }
+
         config_output_path = os.path.join(model_config_dir, f"{model_name}.json")
         try:
             with open(config_output_path, "w") as f:
@@ -281,7 +286,7 @@ def predictions():
 
         # Train model
         try:
-            df = getFeatures(columns=selected)
+            df = getFeatures(columns=selected,model_name=model_name)
             train_model(df, model_name=model_name)
             logging.info(f"✅ Model '{model_name}' trained and saved.")
         except Exception as e:
