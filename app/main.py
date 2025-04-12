@@ -1,4 +1,4 @@
-from flask import Flask, request, render_template, session, redirect, url_for, jsonify 
+from flask import Flask, request, render_template, session, redirect, url_for, jsonify, Blueprint 
 import logging
 import os
 from datetime import datetime
@@ -13,6 +13,9 @@ from dataBase.queryFeatures import getFeatures
 from machineLearning.trainModel import train_model
 from machineLearning.makePredictions import makePreds
 import pandas as pd
+from dashboard.plot import generate_charts
+from dashboard.routes import dashboard_bp
+
 
 # Configure logging
 logging.basicConfig(
@@ -26,6 +29,7 @@ app = Flask(
     template_folder="../Templates",  # Corrected template path
     static_folder="../static"        # Corrected static folder path
 )
+app.register_blueprint(dashboard_bp)
 app.config['UPLOAD_FOLDER'] = 'uploads'
 app.config['ALLOWED_EXTENSIONS'] = {'csv'}
 app.secret_key = secrets.token_hex(32)
@@ -106,11 +110,6 @@ def upload_file():
             return render_template('upload.html', message=f"Error processing file: {e}")
 
     return render_template('upload.html', message="Invalid file type.")
-
-# Dashboard Route
-@app.route("/dashboard")
-def dashboard():
-    return redirect(dash_url)
 
 
 # Configuration Form Route

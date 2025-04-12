@@ -8,7 +8,8 @@
     <p>Upload CSV files and explore insights in Tableau.</p>
 
     <button onclick="window.location.href='{{ url_for('upload_file') }}'">Upload Data</button>
-    <button onclick="window.location.href='{{ url_for('dashboard') }}'">View Dashboard</button>
+    <button onclick="window.location.href='{{ url_for('dashboard.dashboard') }}'">View Dashboard</button>
+
     <button onclick="window.location.href='{{ url_for('predictions') }}'">Generate Predictions</button>
 
 </div>

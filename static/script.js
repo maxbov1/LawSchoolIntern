@@ -256,3 +256,26 @@ function updateTargetAndIdentifierOptions() {
         }
     });
 }
+
+document.addEventListener("DOMContentLoaded", function () {
+    const totalCharts = 12; // Update this to your total chart count
+    const startIndex = 2;   // Number of charts rendered initially
+
+    for (let i = startIndex; i < totalCharts; i++) {
+        fetch(`/chart/${i}`)
+            .then(res => res.text())
+            .then(html => {
+                const container = document.getElementById(`chart-${i}`);
+                if (container) {
+                    container.innerHTML = html;
+                }
+            })
+            .catch(err => {
+                const container = document.getElementById(`chart-${i}`);
+                if (container) {
+                    container.innerHTML = `<p style="color:red;">Failed to load chart ${i + 1}</p>`;
+                }
+                console.error(`Error loading chart ${i}:`, err);
+            });
+    }
+});

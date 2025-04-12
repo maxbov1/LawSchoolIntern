@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>DMS Dashboard</title>
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+    <style>
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f5f6fa;
+        }
+
+        header {
+            background-color: #2c3e50;
+            color: white;
+            padding: 20px 40px;
+            text-align: left;
+            font-size: 24px;
+        }
+
+        .dashboard-container {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            padding: 20px;
+            gap: 20px;
+        }
+
+        .chart-box {
+            background-color: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+            padding: 20px;
+            flex: 1 1 45%;
+            min-width: 350px;
+            max-width: 48%;
+        }
+
+        @media screen and (max-width: 768px) {
+            .chart-box {
+                flex: 1 1 100%;
+                max-width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    📊 DMS Dashboard
+</header>
+
+<div class="dashboard-container">
+	{% for chart_url in charts %}
+    		<iframe src="{{ chart_url }}" width="100%" height="400" style="border:none; margin-bottom: 20px;"></iframe>
+	{% endfor %}
+</div>
+
+<script src="{{ url_for('static', filename='script.js') }}"></script>
+</body>
+</html>
+
