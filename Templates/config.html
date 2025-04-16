@@ -37,6 +37,24 @@
                         </button>
                     </div>
                 </form>
+{% if previous_configs %}
+    <div class="form-section" style="margin-top: 40px;">
+        <h2 style="color: #0C234B;"><i class="fa-solid fa-folder-open"></i> Previous Configurations</h2>
+        <ul style="list-style: none; padding-left: 0;">
+            {% for config_file in previous_configs %}
+                <li style="margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center;">
+                    <span><i class="fa-solid fa-file-code"></i> {{ config_file }}</span>
+                    <form action="/delete_config" method="POST" style="margin: 0;">
+                        <input type="hidden" name="config_file" value="{{ config_file }}">
+                        <button type="submit" class="btn-danger" style="margin-left: 15px;">
+                            <i class="fa-solid fa-trash"></i> Delete
+                        </button>
+                    </form>
+                </li>
+            {% endfor %}
+        </ul>
+    </div>
+{% endif %}
             </div>
 
             <div class="visual-section">
@@ -46,6 +64,7 @@
                 </div>
             </div>
         </div>
+<button onclick="window.location.href='{{ url_for('home') }}'" class="back-button">⬅ Back to Home</button>
     </div>
     <footer class="footer">
         <p>&copy; 2025 University of Arizona - Data Management Platform</p>

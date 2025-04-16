@@ -19,14 +19,13 @@
     <h3>📦 Use an Existing Model</h3>
     {% if existing_models %}
         <ul>
-            {% for model in existing_models %}
-                <li>
-                    <a class="btn-primary" href="{{ url_for('predict_page', model_name=model) }}">
-                        Predict with {{ model }}
-                    </a>
-                </li>
-            {% endfor %}
-        </ul>
+        	<div class="model-card-row">
+    			{% for model in existing_models %}
+        			<a class="model-card" href="{{ url_for('predict_page', model_name=model) }}">
+            			📊 Predict with {{ model }}</a>
+    			{% endfor %}
+		</div>
+	</ul>
     {% else %}
         <p>No trained models found yet.</p>
     {% endif %}

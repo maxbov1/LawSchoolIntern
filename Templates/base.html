@@ -7,13 +7,33 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 <body>
+<header class="header">
+    <div class="header-content">
+        <!-- LEFT: Settings dropdown -->
+        {% if session.get("logged_in") and request.endpoint == 'home' %}
+        <div class="header-left">
+            <div class="dropdown-menu static-visible">
+                <a href="{{ url_for('logout') }}">Logout</a>
+                <a href="{{ url_for('config_form') }}">Edit Config</a>
+                <a href="{{ url_for('edit_user_permissions') }}">Edit User Permissions</a>
+            </div>
+        </div>
+        {% else %}
+        <div class="header-left"></div>
+        {% endif %}
 
-    <header class="header">
-        <h1>James E. Rogers College of Law</h1>
-        <h2> Data Management Platform </h2>
-    </header>
+        <!-- CENTER: Title -->
+        <div class="header-title">
+            <h1>James E. Rogers College of Law</h1>
+            <h2>Data Management Platform</h2>
+        </div>
 
-    {% if not session.get("logged_in") %}
+        <!-- RIGHT: (empty for now) -->
+        <div class="header-right"></div>
+    </div>
+</header>
+
+	{% if not session.get("logged_in") %}
         <!-- Login Form -->
         <div class="login-container">
             <h2>Login</h2>
@@ -32,13 +52,6 @@
             {% endif %}
         </div>
     {% else %}
-        <!-- Navigation Bar -->
-        <nav class="nav-bar">
-            <ul>
-                <li><a href="{{ url_for('home') }}">Home</a></li>
-            </ul>
-        </nav>
-
         <!-- Main Content -->
         <main class="main-content">
             {% block content %}{% endblock %}
@@ -49,6 +62,20 @@
         <p>&copy; 2025 My Flask App | Secure Data Upload & Visualization</p>
     </footer>
 
+<script>
+    function toggleDropdown() {
+        const menu = document.getElementById('settings-menu');
+        menu.classList.toggle('hidden');
+    }
+
+    window.addEventListener('click', function(e) {
+        const menu = document.getElementById('settings-menu');
+        const button = document.querySelector('.settings-button');
+        if (!button.contains(e.target) && !menu.contains(e.target)) {
+            menu.classList.add('hidden');
+        }
+    });
+</script>
+
 </body>
 </html>
-

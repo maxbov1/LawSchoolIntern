@@ -111,11 +111,25 @@ def upload_file():
 
     return render_template('upload.html', message="Invalid file type.")
 
+@app.route('/edit-permissions')
+def edit_user_permissions():
+    # render user permission editor here
+    pass
 
-# Configuration Form Route
 @app.route('/config', methods=['GET'])
 def config_form():
-    return render_template("config.html")
+    config_dir = os.path.join(os.getcwd(), "config")
+    config_file = os.path.join(config_dir, "data_source_config.json")
+    previous_configs = []
+
+    if os.path.exists(config_file):
+        previous_configs = [
+            f for f in os.listdir(config_dir)
+            if f.endswith('.json')
+        ]
+
+    return render_template("config.html", previous_configs=previous_configs)
+
 
 @app.route('/save_config', methods=['POST'])
 def save_config():

@@ -7,6 +7,8 @@ from dataBase.dbBuilder import db_connect
 from pandas.api.types import is_numeric_dtype
 from utils.config_loader import load_config
 import random
+from itertools import combinations
+
 
 CONFIG_PATH = os.path.join("config", "data_source_config.json")
 CACHE_DIR = "/tmp/dashboard_charts"
@@ -26,10 +28,10 @@ def classify_features(df, feature_list):
 
 def generate_charts():
     charts = []
-
+    config = load_config()
     try:
         conn = db_connect()
-        df = pd.read_sql("SELECT * FROM features WHERE result IS NOT NULL", conn)
+        df = pd.read_sql(f"SELECT * FROM features WHERE {config.target_variable} IS NOT NULL", conn)
         conn.close()
         logging.info("Successfully loaded data from database.")
     except Exception as e:
@@ -48,6 +50,9 @@ def generate_charts():
                 features.append(col)
 
     target = config.target_variable
+    df.loc[df['result'] == 'PASS', 'result'] = 1
+    df.loc[df['result'] != 1, 'result'] = 0
+    df['result'] = df['result'].astype(int)
     logging.info(f"features: {features}, target: {target}")
 
     numeric, categorical = classify_features(df, features)
@@ -61,27 +66,24 @@ def generate_charts():
             logging.info(f"Generated histogram for {feature}.")
         except Exception as e:
             logging.warning(f"Failed to generate histogram for {feature}: {e}")
-
-    for feature in categorical:
-        try:
-            grouped = df[feature].value_counts().reset_index()
-            grouped.columns = [feature, 'count']
-            fig = px.bar(grouped, x=feature, y='count', title=f"Counts of {feature}")
-            charts.append(fig.to_html(full_html=False))
-            logging.info(f"Generated bar chart for {feature}.")
-        except Exception as e:
-            logging.warning(f"Failed to generate bar chart for {feature}: {e}")
-
+    
     if target in df.columns:
         if df[target].dtype in ['int64', 'float64']:
-            for feature in numeric:
-                if feature != target:
-                    try:
-                        fig = px.scatter(df, x=feature, y=target, title=f"{feature} vs {target}")
-                        charts.append(fig.to_html(full_html=False))
-                        logging.info(f"Generated scatter plot: {feature} vs {target}.")
-                    except Exception as e:
-                        logging.warning(f"Failed to generate scatter plot for {feature} vs {target}: {e}")
+            # Go through all pairs of features, excluding the target
+            for f1, f2 in combinations([f for f in numeric if f != target], 2):
+                try:
+                    fig = px.scatter(
+                        df,
+                        x=f1,
+                        y=f2,
+                        color=df[target].astype(str),  # convert 0/1 to string for distinct hue
+                        title=f"{f1} vs {f2} by {target}"
+                    )
+                    charts.append(fig.to_html(full_html=False))
+                    logging.info(f"Generated scatter plot: {f1} vs {f2} by {target}.")
+                except Exception as e:
+                    logging.warning(f"Failed to generate scatter plot for {f1} vs {f2}: {e}")
+
     else:
         logging.warning(f"Target variable '{target}' not found in dataframe.")
     random.shuffle(charts)

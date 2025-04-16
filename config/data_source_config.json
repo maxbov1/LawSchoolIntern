@@ -20,11 +20,6 @@
             "Applicant GPA": "float",
             "LSAT": "float"
         },
-        "additional": {
-            "SID": "string",
-            "bar_review": "string",
-            "review_completion": "float"
-        },
         "bar": {
             "SID": "string",
             "juris": "string",
