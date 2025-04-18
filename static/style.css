@@ -314,4 +314,49 @@ select {
 .model-card:hover {
     background-color: #0056b3;
 }
+###### chatbot  ######
+#chat-assistant {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    width: 280px;
+    background: white;
+    border: 1px solid #ccc;
+    box-shadow: 2px 2px 12px rgba(0,0,0,0.2);
+    font-family: Arial, sans-serif;
+    font-size: 14px;
+    border-radius: 10px;
+    overflow: hidden;
+    z-index: 9999;
+}
+
+#chat-toggle {
+    background-color: #0C234B;
+    color: white;
+    padding: 10px;
+    cursor: pointer;
+    font-weight: bold;
+    text-align: center;
+}
+
+#chat-body {
+    padding: 10px;
+    max-height: 300px;
+    display: flex;
+    flex-direction: column;
+}
+
+#chat-log {
+    flex: 1;
+    overflow-y: auto;
+    max-height: 200px;
+    margin-bottom: 10px;
+}
+
+#chat-input {
+    width: 100%;
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+}
 

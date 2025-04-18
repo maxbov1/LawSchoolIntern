@@ -6,7 +6,7 @@
     <title>{% block title %}Data Management Platform{% endblock %}</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
-<body>
+<body data-form="{{ data_form | default('default') }}">
 <header class="header">
     <div class="header-content">
         <!-- LEFT: Settings dropdown -->

@@ -29,14 +29,26 @@ def encrypt_dataframe(df, sensitive_columns, gk):
 
     return df
 
-def decrypt_dataframe(df, gk):
+def decrypt_column(df, column, gk):
+    cipher = Fernet(gk)
+    df[column] = df[column].apply(lambda x: decrypt_value(x, cipher))
+    return df
+
+
+
+def decrypt_dataframe(df,sensitive_columns,gk):
     '''
     this function accepts an ecrypted admissions dataframe, and the generated key. It returns the decrypted dataframe.
 
     '''
     cipher = Fernet(gk) 
-    df['firstname'] = df['firstname'].apply(lambda x: decrypt_value(x, cipher))
-    df['lastname'] = df['lastname'].apply(lambda x: decrypt_value(x, cipher))
+    for col in sensitive_columns:
+        if col in df.columns:
+            df[col] = df[col].apply(lambda x: decrypt_value(x, cipher))
+            logging.info(f"Decrypted column '{col}'")
+        else:
+            logging.warning(f"Sensitive column '{col}' not found in dataframe, skipping decryption.")
+
     return df
 
 def gen_key():

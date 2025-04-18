@@ -15,6 +15,8 @@ from machineLearning.makePredictions import makePreds
 import pandas as pd
 from dashboard.plot import generate_charts
 from dashboard.routes import dashboard_bp
+from chatbot import chatbot_bp
+from dataBase.routes import query_bp
 
 
 # Configure logging
@@ -30,6 +32,9 @@ app = Flask(
     static_folder="../static"        # Corrected static folder path
 )
 app.register_blueprint(dashboard_bp)
+app.register_blueprint(chatbot_bp)
+app.register_blueprint(query_bp)
+
 app.config['UPLOAD_FOLDER'] = 'uploads'
 app.config['ALLOWED_EXTENSIONS'] = {'csv'}
 app.secret_key = secrets.token_hex(32)
@@ -128,7 +133,7 @@ def config_form():
             if f.endswith('.json')
         ]
 
-    return render_template("config.html", previous_configs=previous_configs)
+    return render_template("config.html", previous_configs=previous_configs,data_form="config")
 
 
 @app.route('/save_config', methods=['POST'])
@@ -311,16 +316,17 @@ def predictions():
             features=valid_features,
             existing_models=existing_models,
             model_name=model_name,
-            message=f"✅ Model '{model_name}' trained successfully!"
+            message=f"✅ Model '{model_name}' trained successfully!",
+            data_form="predictions"
         )
 
     # GET: render the full prediction setup page
     return render_template(
         "predictions.html",
         features=valid_features,
-        existing_models=existing_models
+        existing_models=existing_models,
+        data_form="predictions"
     )
-
 
 
 @app.route("/predict/<model_name>", methods=["GET", "POST"])

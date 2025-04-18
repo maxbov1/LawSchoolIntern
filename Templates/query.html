@@ -1,0 +1,66 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="form-container">
+    <h2 class="section-title">🔍 Query Student Records</h2>
+
+    <form method="POST">
+        <div class="form-group">
+            <label for="field">Search By:</label>
+            <select name="field" id="field" required>
+                {% for f in fields %}
+                    <option value="{{ f }}" {% if f == field %}selected{% endif %}>{{ f }}</option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label for="value">Enter Value:</label>
+            <input type="text" name="value" id="value" value="{{ value or '' }}" required>
+        </div>
+
+        <div class="button-group">
+            <button type="submit">Search</button>
+        </div>
+    </form>
+
+    {% if error %}
+        <p style="color: red; margin-top: 15px;"><strong>{{ error }}</strong></p>
+    {% endif %}
+
+    {% if results %}
+    <h3 class="section-title">Results for <code>{{ field }}</code> = "<strong>{{ value }}</strong>"</h3>
+
+    <div class="dashboard-container">
+        {% for row in results %}
+            <div class="model-card" style="background-color: #fff; color: #0C234B; width: 280px; box-shadow: 0 4px 8px rgba(0,0,0,0.1); border-radius: 10px;">
+                <div style="padding: 15px;">
+                    <h4 style="margin-bottom: 10px;">
+                        {{ row.get('firstname', 'N/A') }} {{ row.get('lastname', '') }}
+                    </h4>
+                    <p style="font-size: 14px; line-height: 1.4;">
+                        <strong>SID:</strong> {{ row.get('SID', 'N/A') }}<br>
+                        <strong>Law GPA:</strong> {{ row.get('law_gpa', 'N/A') }}<br>
+                        <strong>LSAT:</strong> {{ row.get('LSAT', 'N/A') }}<br>
+                        <strong>Bar Review:</strong> {{ row.get('bar_review', 'N/A') }}<br>
+                        <strong>Result:</strong> {{ row.get('result', 'N/A') }}
+                    </p>
+                    <div class="button-group">
+                        <button class="btn-secondary" onclick="alert('Record for {{ row.get('SID') }}')">View More</button>
+                    </div>
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+{% elif field and value %}
+    <p style="margin-top: 20px;">No records found for <code>{{ field }}</code> = "<strong>{{ value }}</strong>".</p>
+
+    {% endif %}
+
+    
+    <a href="{{ url_for('home') }}">
+    	<button type="button" class="btn-secondary">Back to Home</button>
+    </a>
+</div>
+{% endblock %}
+
