@@ -2,25 +2,13 @@ import mysql.connector
 import os
 import logging
 from utils.config_loader import load_config
+from .db_helper import connect_project_db
+from flask import g
 
-def db_connect():
-    try:
-        logging.info("🔄 Attempting to connect to the database...")
-        conn = mysql.connector.connect(
-            host="database-barsuccess.c12a2mg6q8ex.us-west-1.rds.amazonaws.com",
-            user="admin",
-            password=os.getenv("pwrd"),
-            database="BarSuccess"
-        )
-        logging.info("✅ Database connection established")
-        return conn
-    except mysql.connector.Error as err:
-        logging.error(f"❌ Database Connection Error: {err}")
-        return None
 
-def create_table(query):
+def create_table(query,project_id=None):
     logging.info(f"🔧 Executing table creation query: {query}")
-    conn = db_connect()
+    conn = connect_project_db(g.project_id)
     if conn is None:
         logging.error("❌ No database connection available.")
         return
@@ -36,7 +24,7 @@ def create_table(query):
         conn.close()
         logging.info("🔒 Database connection closed.")
 
-def build_db():
+def build_db(project_id=None):
     logging.info("🚀 Starting database build process.")
     config = load_config()
     if not config:

@@ -2,8 +2,8 @@ from pydantic import BaseModel, Field, ValidationError
 from typing import Dict, List
 import json
 import logging
+from flask import g
 
-CONFIG_PATH = 'config/data_source_config.json'
 
 class DataSourceConfig(BaseModel):
     source_name: str
@@ -17,7 +17,8 @@ class ConfigData(BaseModel):
 
 def load_config() -> ConfigData:
     try:
-        with open(CONFIG_PATH, 'r') as file:
+        config_path = f'config/project_{g.project_id}/data_source_config.json'
+        with open(config_path, 'r') as file:
             config_data = json.load(file)
         config = ConfigData(**config_data)
         logging.info("Configuration loaded successfully!")

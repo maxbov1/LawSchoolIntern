@@ -1,6 +1,7 @@
 from cryptography.fernet import Fernet
 import pandas as pd
 import logging
+from utils.config_loader import load_config
 
 def encrypt_value(value, cipher):
     if pd.isna(value):  

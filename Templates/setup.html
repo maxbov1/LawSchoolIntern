@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Create New Project</title>
+  <style>
+    label { display: block; margin-top: 10px; font-weight: bold; }
+    input, select { width: 100%; padding: 6px; margin-top: 5px; }
+    .user-block { border: 1px solid #ccc; padding: 10px; margin-bottom: 10px; }
+  </style>
+  <script>
+    function addUser() {
+      const container = document.getElementById("users");
+      const index = container.children.length;
+      const div = document.createElement("div");
+      div.className = "user-block";
+      div.innerHTML = `
+        <label>Name</label>
+        <input name="users[${index}][name]" required>
+        <label>Email</label>
+        <input type="email" name="users[${index}][email]" required>
+        <label>Role</label>
+        <select name="users[${index}][role]" required>
+          <option value="uploader">Uploader</option>
+          <option value="viewer">Viewer</option>
+          <option value="analyst">Analyst</option>
+        </select>
+      `;
+      container.appendChild(div);
+    }
+  </script>
+</head>
+<body>
+  <h2>📦 New Project Setup</h2>
+  <form method="POST" action="/create_project">
+    <label>Organization Name</label>
+    <input name="organization_name" required>
+
+    <label>Project Name</label>
+    <input name="project_name" required>
+
+    <h3>👤 Add Users</h3>
+    <div id="users"></div>
+    <button type="button" onclick="addUser()">➕ Add User</button>
+
+    <br><br>
+    <button type="submit">🚀 Create Project</button>
+  </form>
+</body>
+</html>
+

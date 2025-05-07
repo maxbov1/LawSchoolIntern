@@ -3,17 +3,14 @@ import pandas as pd
 import os
 import logging
 import json
+from .db_helper import connect_project_db
+from flask import g
+
 
 def getFeatures(columns=None,model_name="Default"):
-    conn = mysql.connector.connect(
-        host="database-barsuccess.c12a2mg6q8ex.us-west-1.rds.amazonaws.com",
-        user="admin",
-        password=os.getenv("pwrd"),
-        database="BarSuccess"
-    )
-
+    conn = connect_project_db(g.project_id)
     if model_name:
-        config_path = os.path.join("config", "model_configs", f"{model_name}.json")
+        config_path = os.path.join("config", f"project_{g.project_id}", "model_configs", f"{model_name}.json")
         with open(config_path) as f:
             model_config = json.load(f)
         target = model_config["target"]

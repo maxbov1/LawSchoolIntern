@@ -6,6 +6,7 @@ from sklearn.tree import DecisionTreeClassifier
 from sklearn.model_selection import train_test_split, cross_val_score
 from sklearn.metrics import classification_report
 from sklearn.preprocessing import LabelEncoder
+from flask import g
 
 def train_model(df, model_name="default"):
     df.columns = ['ugpa','LSAT','lgpa','result'] 
@@ -36,8 +37,10 @@ def train_model(df, model_name="default"):
     print("✅ Training complete")
     print(classification_report(y_test, model.predict(X_test)))
 
-    # Save model
-    os.makedirs("models", exist_ok=True)
-    joblib.dump(model, f"models/{model_name}.pkl")
-    print(f"✅ Model saved to models/{model_name}.pkl")
+    model_dir = os.path.join("models", f"project_{g.project_id}")
+    os.makedirs(model_dir, exist_ok=True)
 
+    model_path = os.path.join(model_dir, f"{model_name}.pkl")
+    joblib.dump(model, model_path)
+
+    print(f"✅ Model saved to {model_path}")

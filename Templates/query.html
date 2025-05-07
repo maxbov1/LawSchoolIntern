@@ -45,9 +45,13 @@
                         <strong>Bar Review:</strong> {{ row.get('bar_review', 'N/A') }}<br>
                         <strong>Result:</strong> {{ row.get('result', 'N/A') }}
                     </p>
-                    <div class="button-group">
-                        <button class="btn-secondary" onclick="alert('Record for {{ row.get('SID') }}')">View More</button>
-                    </div>
+		    <div class="button-group">
+    			<form method="POST" action="{{ url_for('query_bp.update_record') }}">
+        			<input type="hidden" name="SID" value="{{ row.get('SID') }}">
+        			<button type="submit" class="btn-secondary">update</button>
+    			</form>
+		    </div>
+
                 </div>
             </div>
         {% endfor %}

@@ -3,16 +3,13 @@ import plotly.express as px
 import json
 import os
 import logging
-from dataBase.dbBuilder import db_connect
 from pandas.api.types import is_numeric_dtype
 from utils.config_loader import load_config
 import random
 from itertools import combinations
+from flask import g
+from dataBase.db_helper import connect_project_db
 
-
-CONFIG_PATH = os.path.join("config", "data_source_config.json")
-CACHE_DIR = "/tmp/dashboard_charts"
-os.makedirs(CACHE_DIR, exist_ok=True)
 
 def classify_features(df, feature_list):
     numeric = []
@@ -29,8 +26,11 @@ def classify_features(df, feature_list):
 def generate_charts():
     charts = []
     config = load_config()
+    # ✅ Create cache dir per project inside request context
+    cache_dir = os.path.join("/tmp/dashboard_charts", f"project_{g.project_id}")
+    os.makedirs(cache_dir, exist_ok=True)
     try:
-        conn = db_connect()
+        conn = connect_project_db(g.project_id)
         df = pd.read_sql(f"SELECT * FROM features WHERE {config.target_variable} IS NOT NULL", conn)
         conn.close()
         logging.info("Successfully loaded data from database.")
@@ -90,7 +90,7 @@ def generate_charts():
     cached_chart_paths = []
 
     for idx, html in enumerate(charts):   
-        cache_path = os.path.join(CACHE_DIR, f"chart_{idx}.html")
+        cache_path = os.path.join(cache_dir, f"chart_{idx}.html")
         with open(cache_path, "w", encoding="utf-8") as f:
             f.write(html)
         cached_chart_paths.append(f"/chart/{idx}")

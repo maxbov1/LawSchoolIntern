@@ -17,7 +17,7 @@ from dashboard.plot import generate_charts
 from dashboard.routes import dashboard_bp
 from chatbot import chatbot_bp
 from dataBase.routes import query_bp
-
+from flask import g
 
 # Configure logging
 logging.basicConfig(
@@ -46,6 +46,17 @@ dash_url = f"http://{TabIP}/views/YourDashboard/Sheet1"
 # ------------------------------
 # Routes
 # ------------------------------
+@app.before_request
+def load_project_id():
+    """
+    Loads the current project_id into the Flask `g` object for request-wide access.
+    This must be set in the session before visiting project-specific pages.
+    """
+    if "project_id" not in session:
+        session["project_id"] = "c012ebd1"  # Replace with your active project
+        logging.warning("⚠️ Default project_id set manually for testing.")
+    g.project_id = session.get("project_id")
+
 
 # Login Route
 @app.route('/login', methods=['POST', 'GET'])
@@ -70,6 +81,7 @@ def login():
 def home():
     if not session.get("logged_in"):
         return redirect(url_for("login"))  # Redirect if not logged in
+    print("🧠 Current project ID:", session.get("project_id"))
     return render_template("home.html")
 
 
@@ -97,13 +109,12 @@ def upload_file():
     if not file or file.filename == '':
         return render_template('upload.html', message="No file selected.")
 
-    # Validate and save the file
     if file and allowed_file(file.filename, app.config['ALLOWED_EXTENSIONS']):
-        filepath = os.path.join(app.config['UPLOAD_FOLDER'], file.filename)
-        os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
+        upload_folder = os.path.join(app.config['UPLOAD_FOLDER'], f"project_{g.project_id}")
+        os.makedirs(upload_folder, exist_ok=True)
+        filepath = os.path.join(upload_folder, file.filename)
         file.save(filepath)
-
-        
+    
         try:
             result_message = process_csv(filepath, category)
             if 'Error' in result_message:
@@ -123,37 +134,29 @@ def edit_user_permissions():
 
 @app.route('/config', methods=['GET'])
 def config_form():
-    config_dir = os.path.join(os.getcwd(), "config")
-    config_file = os.path.join(config_dir, "data_source_config.json")
-    previous_configs = []
+    logging.info(f"🧠 Current project ID: {session.get('project_id')}")
+    config_dir = os.path.join("config", f"project_{g.project_id}")
+    os.makedirs(config_dir, exist_ok=True)
 
-    if os.path.exists(config_file):
-        previous_configs = [
-            f for f in os.listdir(config_dir)
-            if f.endswith('.json')
-        ]
+    previous_configs = [
+        f for f in os.listdir(config_dir) if f.endswith('.json')
+    ]
 
-    return render_template("config.html", previous_configs=previous_configs,data_form="config")
-
+    return render_template("config.html", previous_configs=previous_configs, data_form="config")
 
 @app.route('/save_config', methods=['POST'])
 def save_config():
     try:
         data = request.form.to_dict()
         data_sources = {}
-        sensitive_columns = []  # List to store sensitive columns
-        identifier = None  # To store UID (identifier)
-        target_variable = None
-
+        sensitive_columns = []
+        identifier = None
         target_variable = data.get('target_variable')
-        logging.debug(f"Received target variable: {target_variable}")
 
-        # Ensure the target variable is present
         if not target_variable:
             logging.error("Target variable is missing!")
             return "Error: Target variable is missing.", 400
 
-        # Loop over the form data to process each source
         for key, value in data.items():
             if key.startswith("source_name_"):
                 source_id = key.split("_")[2]
@@ -169,18 +172,13 @@ def save_config():
 
                     if feature_name and feature_type:
                         features[feature_name] = feature_type
-
-                        # Add sensitive columns
                         if is_sensitive:
                             sensitive_columns.append(feature_name)
-
-                        # Set UID (identifier) field
                         if is_identifier:
                             identifier = feature_name
 
                 data_sources[source_name] = features
 
-        # Log the final config structure before saving
         config = {
             "target_variable": target_variable,
             "identifier": identifier,
@@ -188,23 +186,30 @@ def save_config():
             "data_sources": data_sources
         }
 
-        logging.debug(f"Final configuration to be saved: {json.dumps(config, indent=4)}")
+        project_config_dir = os.path.join("config", f"project_{g.project_id}")
+        os.makedirs(project_config_dir, exist_ok=True)
 
-        # Save the configuration to a JSON file
-        os.makedirs("config", exist_ok=True)
-        config_path = os.path.join("config", "data_source_config.json")
+        config_path = os.path.join(project_config_dir, "data_source_config.json")
         with open(config_path, "w") as file:
             json.dump(config, file, indent=4)
-        try:
-            build_db()
-            return logging.info(f"Database created successfully!")
-        except Exception as e:
-            logging.error(f"❌ Error building database: {e}")
-        logging.info(f"✅ Configuration saved successfully: {config_path}")
-        return jsonify({"message": "Configuration saved successfully!"})
+
+        logging.info(f"✅ Config saved: {config_path}")
+        
+        # ✅ STEP 1: Create the project DB first
+        from dataBase.db_helper import create_project_db  # Add this at the top in real file
+        create_project_db(g.project_id)
+        logging.info(f"✅ Database created: project_{g.project_id}")
+
+        # ✅ STEP 2: Build the project tables
+        build_db()
+        logging.info(f"✅ Tables created in database project_{g.project_id}")
+
+        # ✅ Final step: Redirect or success message
+        return redirect("/home")
+
     except Exception as e:
-        logging.error(f"❌ Error saving configuration: {e}")
-        return jsonify({"error": f"Error saving configuration: {str(e)}"}), 500
+        logging.error(f"❌ Error in save_config: {e}")
+        return jsonify({"error": f"Failed to save configuration: {str(e)}"}), 500
 
 # Build Database Route
 @app.route('/build_db', methods=['GET'])
@@ -229,7 +234,7 @@ def predictions():
     logging.info("🔁 /predictions endpoint hit")
 
     # Load config
-    config_path = os.path.join("config", "data_source_config.json")
+    config_path = os.path.join("config", f"project_{g.project_id}", "data_source_config.json")
     logging.info(f"📄 Loading config from: {config_path}")
     try:
         with open(config_path) as f:
@@ -257,7 +262,7 @@ def predictions():
     logging.info(f"✅ Valid features: {valid_features}")
 
     # List existing models
-    model_config_dir = os.path.join("config", "model_configs")
+    model_config_dir = os.path.join("config", f"project_{g.project_id}", "model_configs")
     os.makedirs(model_config_dir, exist_ok=True)
     try:
         existing_models = [
@@ -292,6 +297,9 @@ def predictions():
         'features': selected,
         'target': target
         }
+
+        model_config_dir = os.path.join("config", f"project_{g.project_id}", "model_configs")
+        os.makedirs(model_config_dir, exist_ok=True)
 
         config_output_path = os.path.join(model_config_dir, f"{model_name}.json")
         try:
@@ -338,8 +346,9 @@ def predict_page(model_name):
             return "No file uploaded.", 400
 
         # Save the uploaded file temporarily
-        temp_file_path = os.path.join("temp", file.filename)
-        os.makedirs("temp", exist_ok=True)
+        temp_folder = os.path.join("temp", f"project_{g.project_id}")
+        temp_file_path = os.path.join(temp_folder, file.filename)
+        os.makedirs(temp_folder, exist_ok=True)
         file.save(temp_file_path)
         logging.info(f"file saved {file.filename } ") 
 
@@ -364,7 +373,7 @@ def predict_page(model_name):
 
         except Exception as e:
             return f"An error occurred: {str(e)}", 500
-
+    
         finally:
             # Clean up: remove the temporary file
             os.remove(temp_file_path)

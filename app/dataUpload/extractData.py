@@ -6,18 +6,8 @@ import json
 import os
 from utils.dynamic_models import create_dynamic_model
 from pydantic import ValidationError
+from utils.config_loader import load_config
 
-
-CONFIG_PATH = 'config/data_source_config.json'
-
-
-def load_config():
-    try:
-        with open(CONFIG_PATH, 'r') as file:
-            return json.load(file)
-    except Exception as e:
-        logging.error(f"Error loading configuration: {e}")
-        return None
 
 def extract(category, data, cols=None):
     '''
@@ -53,7 +43,7 @@ def extract(category, data, cols=None):
             except Exception as e:
                 logging.exception(f"Unexpected error processing 'additional' category: {e}")
 
-        elif category == 'bar':
+        elif category == 'Bar':
             try:
                 bar_clean = invalidated_df.dropna(subset=['SID'])
 
@@ -65,7 +55,7 @@ def extract(category, data, cols=None):
             except Exception as e:
                 logging.exception(f"Unexpected error processing 'bar' category: {e}")
 
-        elif category == 'registrar':
+        elif category == 'Registrar':
             try:
                 registrar = invalidated_df.dropna(subset=['SID'])
                 registrar['SID'] = registrar['SID'].astype(str).str.zfill(8)
@@ -76,7 +66,7 @@ def extract(category, data, cols=None):
             except Exception as e:
                 logging.exception(f"Unexpected error processing 'registrar' category: {e}")
 
-        elif category == 'admissions':
+        elif category == 'Admissions':
             try:
                 #invalidated_df.columns = ['SID', 'lsat_score', 'undergrad_gpa']
                 admissions_cleaned = invalidated_df

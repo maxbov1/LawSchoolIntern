@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="form-container">
+    <h2 class="section-title">✏️ Edit Student Record</h2>
+
+    <form method="POST" action="{{ url_for('query_bp.update_record') }}">
+        {% for key, value in record.items() %}
+            <div class="form-group">
+                <label>{{ key }}</label>
+                <input 
+                    type="text" 
+                    name="{{ key }}" 
+                    value="{{ value }}" 
+                    {% if key == identifier %}readonly{% endif %}
+                    style="width: 100%; margin-bottom: 10px;"
+                >
+            </div>
+        {% endfor %}
+        <input type="hidden" name="SID" value="{{ record[identifier] }}">
+        <button type="submit" class="btn-secondary">💾 Save Changes</button>
+    </form>
+
+    <a href="{{ url_for('query_bp.query_page') }}">
+        <button class="btn-secondary" style="margin-top: 20px;">⬅️ Back</button>
+    </a>
+</div>
+{% endblock %}
+

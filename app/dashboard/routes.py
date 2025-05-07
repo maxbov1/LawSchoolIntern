@@ -1,4 +1,4 @@
-from flask import Blueprint, render_template, send_file
+from flask import Blueprint, render_template, send_file, g
 from .plot import generate_charts
 import os
 
@@ -12,7 +12,8 @@ def dashboard():
 
 @dashboard_bp.route("/chart/<int:chart_index>")
 def get_chart(chart_index):
-    cache_path = f"/tmp/dashboard_charts/chart_{chart_index}.html"
-    if os.path.exists(cache_path):
-        return send_file(cache_path)
+    path = f"/tmp/dashboard_charts/project_{g.project_id}/chart_{chart_index}.html"
+    if os.path.exists(path):
+        return send_file(path)
     return "Chart not found", 404
+

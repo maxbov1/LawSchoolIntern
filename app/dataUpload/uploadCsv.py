@@ -1,21 +1,11 @@
 import pandas as pd
 from dataUpload.extractData import extract, typeConvert, validateData
-from dataBase.dataFrameToTable import db_connect, insert_data
+from dataBase.dataFrameToTable import insert_data
 import os
 from dataBase.encrypt import encrypt_dataframe, decrypt_dataframe, encrypt_value
 import logging
 import json
-
-CONFIG_PATH = 'config/data_source_config.json'
-
-
-def load_config():
-    try:
-        with open(CONFIG_PATH, 'r') as file:
-            return json.load(file)
-    except Exception as e:
-        logging.error(f"Error loading configuration: {e}")
-        return None
+from utils.config_loader import load_config  
 
 
 def allowed_file(filename, allowed_extensions):
@@ -36,7 +26,9 @@ def process_csv(filepath, category):
     """
     # Load the configuration
     config = load_config()
-    if not config or category not in config['data_sources']:
+    data_sources = config.data_sources
+    sensitive_columns = config.sensitive_columns
+    if not config or category not in config.data_sources:
         raise ValueError(f"Invalid category '{category}' or missing configuration.")
     
     try:
@@ -63,7 +55,6 @@ def process_csv(filepath, category):
             return f"Error: Validation failed for category '{category}': {validation_error}"
         
         # Step 2: Dynamically encrypt sensitive data based on configuration
-        sensitive_columns = config.get('sensitive_columns', [])
         if sensitive_columns:
             logging.info(f"Sensitive columns for {category}: {sensitive_columns}")
 

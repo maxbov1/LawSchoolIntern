@@ -1,27 +1,15 @@
 import logging
+from flask import g
 import pandas as pd
 import mysql.connector
 import os
 import numpy as np
 from utils.config_loader import load_config
-
-
-def db_connect():
-    """ Establishes a connection to the MySQL database. """
-    try:
-        conn = mysql.connector.connect(
-            host="database-barsuccess.c12a2mg6q8ex.us-west-1.rds.amazonaws.com",
-            user="admin",
-            password=os.getenv("pwrd"),
-            database="BarSuccess"
-        )
-        return conn
-    except mysql.connector.Error as err:
-        logging.error(f"Database Connection Error: {err}")
+from .db_helper import connect_project_db
 
 def insert_data(df, category):
     """ Inserts data into the MySQL database based on the category. """
-    conn = db_connect()
+    conn = connect_project_db(g.project_id)
     if conn is None:
         return
     cursor = conn.cursor()
@@ -100,8 +88,10 @@ def insert_data(df, category):
         placeholders = ", ".join(["%s"] * (len(filtered_non_sensitive_df.columns) - 1))  
 
         # Construct the final query
-        query = f"INSERT INTO features ({identifier}, {feature_columns}) VALUES (%s, {placeholders}) " \
-                f"ON DUPLICATE KEY UPDATE {update_columns};"
+        query = (
+    f"INSERT INTO features ({identifier}, {feature_columns}) VALUES (%s, {placeholders}) "
+    f"ON DUPLICATE KEY UPDATE {update_columns};"
+        )
         logging.info(f"Generated Query: {query}")
         
 

@@ -1,9 +1,0 @@
-{
-    "model_name": "BarSuccess",
-    "features": [
-        "Applicant GPA",
-        "LSAT",
-        "law_gpa"
-    ],
-    "target": "result"
-}
