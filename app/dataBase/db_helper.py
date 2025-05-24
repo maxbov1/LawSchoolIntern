@@ -6,10 +6,10 @@ def connect_central_db():
     """ Connect to the central BarSuccess database on RDS """
     try:
         conn = mysql.connector.connect(
-            host="database-barsuccess.c12a2mg6q8ex.us-west-1.rds.amazonaws.com",
-            user="admin",
+            host="bar-success-db-test.cluster-c0xzlo6s7duc.us-west-2.rds.amazonaws.com",
+            user=os.getenv("user"),
             password=os.getenv("pwrd"),
-            database="BarSuccess"
+            database="Central"
         )
         return conn
     except mysql.connector.Error as err:

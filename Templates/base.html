@@ -12,12 +12,12 @@
         <!-- LEFT: Settings dropdown -->
         {% if session.get("logged_in") and request.endpoint == 'home' %}
         <div class="header-left">
-            <div class="dropdown-menu static-visible">
-                <a href="{{ url_for('logout') }}">Logout</a>
-                <a href="{{ url_for('config_form') }}">Edit Config</a>
-                <a href="{{ url_for('edit_user_permissions') }}">Edit User Permissions</a>
-            </div>
-        </div>
+       	    <div class="dropdown-menu static-visible">
+    		<a href="{{ url_for('auth_bp.logout') }}">Logout</a>
+    		<a href="{{ url_for('config_bp.config_form') }}">Edit Config</a>
+    		<a href="{{ url_for('edit_user_permissions') }}">Edit User Permissions</a>
+	    </div>
+	</div>
         {% else %}
         <div class="header-left"></div>
         {% endif %}
@@ -37,7 +37,7 @@
         <!-- Login Form -->
         <div class="login-container">
             <h2>Login</h2>
-            <form method="POST" action="{{ url_for('login') }}">
+            <form method="POST" action="{{ url_for('auth_bp.login') }}">
                 <label for="username">Username:</label>
                 <input type="text" id="username" name="username" required>
 

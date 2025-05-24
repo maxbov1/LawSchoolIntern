@@ -8,9 +8,6 @@ WORKDIR /app
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Ensure config directory exists at runtime
-RUN mkdir -p /app/config
-
 # Copy the rest of the app
 COPY . .
 
@@ -18,5 +15,5 @@ COPY . .
 EXPOSE 5050
 
 # Run Flask
-CMD ["python", "app/main.py"]
+CMD ["python3", "app/main.py"]
 

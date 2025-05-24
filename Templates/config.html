@@ -20,7 +20,7 @@
                     <div class="lds-ring"><div></div><div></div><div></div><div></div></div>
                     <p>Saving configuration, please wait...</p>
                 </div>
-                <form action="/save_config" method="POST" onsubmit="submitForm(event)">
+                <form action="{{ url_for('config_bp.save_config') }}" method="POST" onsubmit="submitForm(event)">
                     <div id="dataSources"></div>
                     <div id="targetSection" class="form-section" style="display: none;">
                         <h3 style="color: #900C3F;"><i class="fa-solid fa-bullseye"></i> Target Variable</h3>
@@ -64,7 +64,7 @@
                 </div>
             </div>
         </div>
-<button onclick="window.location.href='{{ url_for('home') }}'" class="back-button">⬅ Back to Home</button>
+<button onclick="window.location.href='{{ url_for('auth_bp.home') }}'" class="back-button">⬅ Back to Home</button>
     </div>
     <footer class="footer">
         <p>&copy; 2025 University of Arizona - Data Management Platform</p>

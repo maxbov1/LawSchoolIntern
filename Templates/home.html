@@ -7,10 +7,10 @@
     <h3>Welcome to the Data Management App</h3>
     <p>Upload CSV files, Explore Insights, and Generate Predictions</p>
 
-    <button onclick="window.location.href='{{ url_for('upload_file') }}'">Upload Data</button>
+    <button onclick="window.location.href='{{ url_for('upload_bp.upload_file') }}'">Upload Data</button>
     <button onclick="window.location.href='{{ url_for('dashboard.dashboard') }}'">View Dashboard</button>
 
-    <button onclick="window.location.href='{{ url_for('predictions') }}'">Generate Predictions</button>
+    <button onclick="window.location.href='{{ url_for('prediction_bp.predictions') }}'">Generate Predictions</button>
     <button onclick="window.location.href='{{ url_for('query_bp.query_page') }}'">Search Records</button>
 
 </div>

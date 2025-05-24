@@ -1,0 +1,26 @@
+{
+    "target_variable": "result",
+    "identifier": "SID",
+    "sensitive_columns": ["firstname", "lastname", "NetID"],
+    "data_sources": {
+        "admissions": {
+            "SID": "string",
+            "Applicant GPA": "float",
+            "LSAT": "float"
+        },
+        "bar": {
+            "SID": "string",
+            "result": "string",
+            "juris": "string"
+        },
+        "registrar": {
+            "SID": "string",
+            "firstname": "string",
+            "lastname": "string",
+            "NetID": "string",
+            "ua_email": "string",
+            "grad_date": "string",
+            "law_gpa": "float"
+        }
+    }
+}

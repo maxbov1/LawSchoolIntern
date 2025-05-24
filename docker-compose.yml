@@ -4,9 +4,9 @@ services:
     ports:
       - "5050:5050"
     volumes:
-      - /home/ec2-user/BarSuccess/LawSchoolIntern:/app
-      - /home/ec2-user/BarSuccess/LawSchoolIntern/config/model_configs:/app/config/model_configs
-      - /home/ec2-user/BarSuccess/LawSchoolIntern/config:/app/config
-      - /home/ec2-user/BarSuccess/LawSchoolIntern/models:/app/models
+      - /home/ec2-user/LawSchoolIntern:/app
+      - /home/ec2-user/LawSchoolIntern/config/model_configs:/app/config/model_configs
+      - /home/ec2-user/LawSchoolIntern/config:/app/config
+      - /home/ec2-user/LawSchoolIntern/models:/app/models
     restart: always
 

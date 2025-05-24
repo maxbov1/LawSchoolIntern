@@ -21,7 +21,7 @@
         <ul>
         	<div class="model-card-row">
     			{% for model in existing_models %}
-        			<a class="model-card" href="{{ url_for('predict_page', model_name=model) }}">
+        			<a class="model-card" href="{{ url_for('prediction_bp.predict_page', model_name=model) }}">
             			📊 Predict with {{ model }}</a>
     			{% endfor %}
 		</div>
