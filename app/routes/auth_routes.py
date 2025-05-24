@@ -13,7 +13,7 @@ def login():
             session["user_secret_key"] = secrets.token_hex(32)
             session["logged_in"] = True
             session["username"] = username
-            return redirect(url_for("home"))
+            return redirect(url_for("auth_bp.home"))
 
         return render_template("base.html", error="Invalid username or password.")
     return render_template("base.html")
