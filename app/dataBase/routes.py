@@ -52,7 +52,7 @@ def query_page():
 
                 genkey = os.getenv("genkey")
                 if not genkey:
-                    raise ValueError("Missing genkey in environment")
+                    raise ValueError("Missing key in environment")
 
                 identity_df = decrypt_column(identity_df, field, genkey.encode())
                 matched_sids = identity_df[identity_df[field] == value]['SID'].tolist()

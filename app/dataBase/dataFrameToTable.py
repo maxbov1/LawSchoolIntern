@@ -34,10 +34,6 @@ def insert_data(df, category):
     # Replace NaN with None after enforcing correct data types
     df = df.where(pd.notnull(df), None)
 
-    # Log the cleaned data before splitting
-    logging.info(f"Cleaned data before splitting:\n{df.head()}")
-    logging.info(f"Data types after cleaning: {df.dtypes}")
-
     # Extract sensitive and non-sensitive data (always include the identifier column)
     sensitive_df = df[[identifier] + [col for col in df.columns if col in sensitive_columns]].replace({np.nan: None})
     non_sensitive_df = df[[identifier] + [col for col in df.columns if col not in sensitive_columns and col != identifier]]
@@ -50,7 +46,6 @@ def insert_data(df, category):
         placeholders = ", ".join(["%s"] * len(sensitive_df.columns))
         query = f"INSERT INTO identity ({identity_columns}) VALUES ({placeholders}) ON DUPLICATE KEY UPDATE " + ", ".join([f"{col} = VALUES({col})" for col in sensitive_df.columns])
         try:
-            logging.debug(f"Identity columns: {identity_columns}")
             logging.debug(f"SQL Query: {query}")
             cursor.executemany(query, identity_data)
             conn.commit()
@@ -96,10 +91,6 @@ def insert_data(df, category):
         
 
         sample_record = update_data[0] if update_data else None
-        logging.info(f"Sample Record: {sample_record}")
-        logging.info(f"Number of placeholders: {len(placeholders.split(','))}")
-        logging.info(f"Number of values in sample record: {len(sample_record)}")
-        logging.info(f"Expected placeholders: {len(filtered_non_sensitive_df.columns)}")
         
         try:
             cursor.executemany(query, update_data)
