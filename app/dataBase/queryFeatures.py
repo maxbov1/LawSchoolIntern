@@ -5,12 +5,15 @@ import logging
 import json
 from .db_helper import connect_project_db
 from flask import g
+from utils.path_helper import get_model_config_path
 
 
 def getFeatures(columns=None,model_name="Default"):
     conn = connect_project_db(g.project_id)
     if model_name:
-        config_path = os.path.join("config", f"project_{g.project_id}", "model_configs", f"{model_name}.json")
+        config_path = get_model_config_path(g.project_id, model_name)
+        if not config_path.exists():
+            raise FileNotFoundError(f"Model config not found at {config_path}")
         with open(config_path) as f:
             model_config = json.load(f)
         target = model_config["target"]

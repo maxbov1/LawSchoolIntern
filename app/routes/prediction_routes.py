@@ -11,8 +11,10 @@ from utils.path_helper import (
     get_model_config_path,
     get_temp_upload_path
 )
+import traceback
 
 prediction_bp = Blueprint('prediction_bp', __name__)
+
 
 @prediction_bp.route("/predictions", methods=["GET", "POST"])
 def predictions():
@@ -65,6 +67,9 @@ def predictions():
         try:
             with config_output_path.open("w") as f:
                 json.dump(model_config, f, indent=4)
+                logging.info(f"💾 Saving model config to {config_output_path}")
+                logging.debug(f"Config contents: {json.dumps(model_config, indent=2)}")
+
         except Exception as e:
             logging.error(f"❌ Failed to save model config: {e}")
             return "Error saving model config.", 500
@@ -74,6 +79,7 @@ def predictions():
             train_model(df, model_name=model_name)
         except Exception as e:
             logging.error(f"❌ Model training failed: {e}")
+            traceback.print_exc()
             return f"Model training failed: {e}", 500
 
         return render_template("predictions.html", features=valid_features, existing_models=existing_models, model_name=model_name, message=f"✅ Model '{model_name}' trained successfully!", data_form="predictions")

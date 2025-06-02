@@ -43,7 +43,7 @@ def extract(category, data, cols=None):
             except Exception as e:
                 logging.exception(f"Unexpected error processing 'additional' category: {e}")
 
-        elif category == 'Bar':
+        elif category == 'bar':
             try:
                 bar_clean = invalidated_df.dropna(subset=['SID'])
 
@@ -55,7 +55,7 @@ def extract(category, data, cols=None):
             except Exception as e:
                 logging.exception(f"Unexpected error processing 'bar' category: {e}")
 
-        elif category == 'Registrar':
+        elif category == 'registrar':
             try:
                 registrar = invalidated_df.dropna(subset=['SID'])
                 registrar['SID'] = registrar['SID'].astype(str).str.zfill(8)
@@ -66,7 +66,7 @@ def extract(category, data, cols=None):
             except Exception as e:
                 logging.exception(f"Unexpected error processing 'registrar' category: {e}")
 
-        elif category == 'Admissions':
+        elif category == 'admissions':
             try:
                 #invalidated_df.columns = ['SID', 'lsat_score', 'undergrad_gpa']
                 admissions_cleaned = invalidated_df

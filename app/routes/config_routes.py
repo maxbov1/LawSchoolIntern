@@ -1,12 +1,24 @@
-from flask import Blueprint, render_template, request, session, redirect, jsonify, g
+from flask import Blueprint, render_template, request, session, redirect, jsonify, g, url_for
 import json, logging
 from pathlib import Path
-
+import uuid
 from dataBase.dbBuilder import build_db
 from dataBase.db_helper import create_project_db
 from utils.path_helper import get_project_config_dir, get_data_source_config_path
 
 config_bp = Blueprint('config_bp', __name__)
+
+@config_bp.route('/setup', methods=['GET', 'POST'])
+def setup():
+    if request.method == 'POST':
+        project_id = f"{uuid.uuid4().hex[:8]}"
+        session['project_id'] = project_id
+
+        logging.info(f"🆕 New project created in session: {project_id}")
+
+        return redirect(url_for('config_bp.config_form'))
+
+    return render_template('setup.html')
 
 @config_bp.route('/config', methods=['GET'])
 def config_form():

@@ -41,7 +41,7 @@ app.register_blueprint(query_bp)
 @app.before_request
 def load_project_id():
     if "project_id" not in session:
-        session["project_id"] = "c012ebd1"
+        session["project_id"] = "c45be93f"
         logging.warning("⚠️ Default project_id set manually for testing.")
     g.project_id = session.get("project_id")
 

@@ -1,12 +1,20 @@
+version: '3.8'
+
 services:
-  flask_app:
+  law_intern_flaskapp:
     build: .
+    image: law_intern_flaskapp
+    container_name: law_intern_flaskapp
+    mem_limit: 1g
     ports:
       - "5050:5050"
+    environment:
+      pwrd: "${pwrd}"
+      user: "${user}"
+      genkey: "${genkey}"
+      OPENAI_KEY: "${OPENAI_KEY}"
+      SENDGRID_API_KEY: "${SENDGRID_API_KEY}"
     volumes:
-      - /home/ec2-user/LawSchoolIntern:/app
-      - /home/ec2-user/LawSchoolIntern/config/model_configs:/app/config/model_configs
       - /home/ec2-user/LawSchoolIntern/config:/app/config
-      - /home/ec2-user/LawSchoolIntern/models:/app/models
-    restart: always
+    restart: unless-stopped
 

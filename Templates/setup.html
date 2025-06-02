@@ -35,7 +35,7 @@
 <body>
   <div class="form-container">
     <h2 class="section-title">📦 New Project Setup</h2>
-    <form method="POST" action="/create_project">
+    <form method="POST" action="{{ url_for('config_bp.setup') }}">  
       <div class="form-group">
         <label for="organization_name">Organization Name</label>
         <input name="organization_name" id="organization_name" required>
