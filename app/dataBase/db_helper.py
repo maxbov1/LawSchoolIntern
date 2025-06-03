@@ -4,7 +4,10 @@ import logging
 from sendgrid import SendGridAPIClient
 from sendgrid.helpers.mail import Mail
 import secrets
+from dotenv import load_dotenv
+import os
 
+load_dotenv()
 
 
 def connect_central_db():
@@ -49,6 +52,8 @@ def connect_project_db(project_id):
 
 
 def send_invite_email(user_email, user_name, user_id, project_name):
+    print("📬 Starting send_invite_email()")
+
     token = generate_invite_token(user_id)
     if not token:
         return False
@@ -82,6 +87,8 @@ def send_invite_email(user_email, user_name, user_id, project_name):
         response = sg.send(message)
         logging.debug(f"📧 Invite link for {user_email}: {invite_link}")
         logging.info(f"✅ Invite email sent to {user_email} (Status: {response.status_code})")
+        print(f"✅ Invite email sent to {user_email} (Status: {response.status_code})")
+        print(f"📧 Invite link for {user_email}: {invite_link}")
     except Exception as e:
         logging.error(f"❌ Failed to send invite to {user_email}: {e}")
 
@@ -100,3 +107,11 @@ def generate_invite_token(user_id):
     finally:
         cursor.close()
         conn.close()
+
+if __name__ == "__main__":
+    send_invite_email(
+        user_email="maxboving@gmail.com",
+        user_name="Max test",
+        user_id=2,
+        project_name="BarSuccess"
+    )
